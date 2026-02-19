@@ -12,9 +12,9 @@
 
 ---
 
-## The Problem
+## Why This Exists
 
-Default matplotlib produces charts that *show* data but don't *tell* stories. Every chart comes out with rainbow colors, framed legends, rotated labels, and a descriptive title like "CO2 Emissions by Country." The viewer has to do all the thinking.
+After reading *Storytelling with Data* by Cole Nussbaumer Knaflic, I wanted a resource I could quickly spin up to make powerful graphs using the language I knew and the most powerful plotting library in Python. matplotlib can do anything — but out of the box it produces charts that *show* data without *telling* stories. Rainbow colors, framed legends, rotated labels, and a title like "CO2 Emissions by Country." The viewer has to do all the thinking.
 
 StoryGraph flips that. Gray everything, color the story, title the insight, annotate the "why." The viewer gets the point in two seconds.
 
