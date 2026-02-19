@@ -1,0 +1,68 @@
+# ============================================================
+# AUSTIN STYLE - PRESENTATION
+# ============================================================
+# Optimized for slides, projectors, and viewing from a distance
+# Larger fonts, thicker lines, high contrast
+# Colorblind-safe High Contrast palette
+# ============================================================
+
+# === FIGURE ===
+figure.facecolor: white
+figure.figsize: 12, 7
+figure.dpi: 150
+savefig.dpi: 300
+savefig.bbox: tight
+savefig.facecolor: white
+
+# === FONTS ===
+font.family: sans-serif
+font.sans-serif: IBM Plex Sans, DejaVu Sans, Arial
+
+# === SPINES ===
+axes.spines.top: False
+axes.spines.right: False
+axes.spines.bottom: True
+axes.spines.left: True
+axes.edgecolor: bbbbbb
+axes.linewidth: 1.5
+axes.facecolor: white
+
+# === FONT SIZES (Presentation - ~40% larger) ===
+axes.labelsize: 16
+axes.titlesize: 20
+axes.titleweight: bold
+xtick.labelsize: 14
+ytick.labelsize: 14
+legend.fontsize: 14
+
+# === GRID ===
+axes.grid: False
+grid.linewidth: 1.2
+
+# === LINES & MARKERS (Thicker for visibility) ===
+lines.linewidth: 3.5
+lines.markersize: 10
+lines.markeredgewidth: 0
+patch.linewidth: 0.8
+
+# === TICKS ===
+xtick.major.width: 1.5
+ytick.major.width: 1.5
+xtick.minor.width: 0.8
+ytick.minor.width: 0.8
+xtick.major.size: 6
+ytick.major.size: 6
+xtick.major.pad: 8
+ytick.major.pad: 8
+
+# === LEGEND ===
+legend.frameon: False
+
+# === COLORS (High Contrast - Colorblind Safe) ===
+# Primary: Purple | Secondary: Dark Teal | Positive: Sea Green | Accent: Gold | Negative: Orange | Neutral: Dark Gray
+axes.prop_cycle: cycler('color', ['5C2593', '0A5E73', '1A936F', 'E8B72C', 'BF5B04', '4A4A4A'])
+
+# === ANTI-ALIASING ===
+lines.antialiased: True
+patch.antialiased: True
+text.antialiased: True

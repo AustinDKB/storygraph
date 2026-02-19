@@ -1,0 +1,65 @@
+# ============================================================
+# AUSTIN STYLE - NOTEBOOK
+# ============================================================
+# Optimized for Jupyter notebooks and interactive work
+# Colorblind-safe High Contrast palette
+# ============================================================
+
+# === FIGURE ===
+figure.facecolor: white
+figure.figsize: 10, 6
+figure.dpi: 150
+savefig.dpi: 300
+savefig.bbox: tight
+savefig.facecolor: white
+
+# === FONTS ===
+font.family: sans-serif
+font.sans-serif: IBM Plex Sans, DejaVu Sans, Arial
+
+# === SPINES ===
+axes.spines.top: False
+axes.spines.right: False
+axes.spines.bottom: True
+axes.spines.left: True
+axes.edgecolor: bbbbbb
+axes.linewidth: 1.0
+axes.facecolor: white
+
+# === FONT SIZES ===
+axes.labelsize: 12
+axes.titlesize: 14
+axes.titleweight: bold
+xtick.labelsize: 11
+ytick.labelsize: 11
+legend.fontsize: 10
+
+# === GRID ===
+axes.grid: False
+grid.linewidth: 1
+
+# === LINES & MARKERS ===
+lines.linewidth: 2.5
+lines.markersize: 7
+lines.markeredgewidth: 0
+patch.linewidth: 0.3
+
+# === TICKS ===
+xtick.major.width: 1
+ytick.major.width: 1
+xtick.minor.width: 0.5
+ytick.minor.width: 0.5
+xtick.major.pad: 7
+ytick.major.pad: 7
+
+# === LEGEND ===
+legend.frameon: False
+
+# === COLORS (High Contrast - Colorblind Safe) ===
+# Primary: Purple | Secondary: Dark Teal | Positive: Sea Green | Accent: Gold | Negative: Orange | Neutral: Dark Gray
+axes.prop_cycle: cycler('color', ['5C2593', '0A5E73', '1A936F', 'E8B72C', 'BF5B04', '4A4A4A'])
+
+# === ANTI-ALIASING ===
+lines.antialiased: True
+patch.antialiased: True
+text.antialiased: True
