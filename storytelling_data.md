@@ -709,15 +709,15 @@ from austin_annotations import create_x_figure, save_x_figure, add_figure_footer
 fig, ax = create_x_figure()
 # … plot …
 # Title band: place insight titles with ax.text(..., transform=ax.transAxes) above y=1.0
-# Footer safe-zone: reserved below the axes (subplots_adjust bottom≈0.14)
+# Footer safe-zone: reserved below the axes (see X_SUBPLOT)
 add_figure_footer(fig, 'Source: AAFC / StatCan, 2024', handle='@AustinBakanec')
 save_x_figure(fig, 'crop_chart.png')  # → 1200×675 PNG
 ```
 
-Layout (figure fraction via `create_x_figure`):
-- **Title band** — above the axes (`top≈0.78`); put headline / subtitle here
+Layout (figure-fraction margins live in `X_SUBPLOT` in `austin_annotations.py`, applied by `create_x_figure`):
+- **Title band** — above the axes; put headline / subtitle here
 - **Plot** — middle band
-- **Footer safe-zone** — below the axes (`bottom≈0.14`); source left, `@handle · date` right
+- **Footer safe-zone** — below the axes; source left, `@handle · date` right
 
 Slide workflows keep using `austin_presentation.mplstyle` with tight bbox as before.
 

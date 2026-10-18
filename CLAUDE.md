@@ -271,7 +271,7 @@ Then offer to generate code for those too.
 8. **Verify what the data measures before making claims.** If the data is per-country, don't claim "X% of the world's population" unless you've confirmed with population weighting. If the data is GDP per capita, don't call it "income." Match your annotation language to what the data actually represents — or flag the approximation honestly.
 
 ### X canvas (1200×675)
-Title band above the axes (`subplots_adjust` top≈0.78), plot in the middle, footer safe-zone below (bottom≈0.14) for `add_figure_footer`. Never rely on `bbox_inches='tight'` for these exports — see `storytelling_data.md`.
+Title band above the axes, plot in the middle, footer safe-zone below for `add_figure_footer` — margins come from `X_SUBPLOT` in `austin_annotations.py` (applied by `create_x_figure()`). Never rely on `bbox_inches='tight'` for these exports — see `storytelling_data.md`.
 
 ## File Locations
 
