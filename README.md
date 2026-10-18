@@ -124,7 +124,7 @@ PALETTE = {
     'negative':  '#BF5B04',  # Deep orange  - bad news, decreases
     'positive':  '#1A936F',  # Sea green    - good news, increases
     'neutral':   '#4A4A4A',  # Dark gray    - context, de-emphasized
-    'accent':    '#E8B72C',  # Bright gold  - reserved for shock value
+    'accent':    '#E8B72C',  # Bright gold  - genuine records only
 }
 ```
 

@@ -28,7 +28,7 @@ PALETTE = {
     'negative': '#BF5B04',     # Deep orange (NOT red) - warnings, decreases
     'positive': '#1A936F',     # Sea green - wins, increases, good news
     'neutral': '#4A4A4A',      # Dark gray - context, de-emphasized
-    'accent': '#E8B72C',       # Bright gold - highlights, special emphasis
+    'accent': '#E8B72C',       # Bright gold - genuine records only (rare)
 }
 
 # Color cycle for automatic assignment (primary first)
@@ -177,7 +177,7 @@ PRESETS = {
         ),
     },
     
-    # Accent callout - special highlights
+    # Accent callout - genuine records only
     'accent': {
         'fontsize': 11,
         'fontweight': 'bold',
