@@ -17,7 +17,10 @@ plt.style.use('/home/austin/Desktop/storygraph/austin_style_kit/my_notebook.mpls
 
 ### The Palette (always use these colors — never use matplotlib defaults)
 ```python
-from austin_annotations import annotate, PALETTE, add_source_note, add_title_annotation
+from austin_annotations import (
+    annotate, PALETTE, add_source_note, add_title_annotation,
+    add_figure_footer, create_x_figure, save_x_figure,
+)
 
 PALETTE = {
     'primary':   '#5C2593',  # Deep purple — main data, key callouts
@@ -25,7 +28,7 @@ PALETTE = {
     'negative':  '#BF5B04',  # Deep orange (NOT red) — bad news, decreases
     'positive':  '#1A936F',  # Sea green — good news, increases
     'neutral':   '#4A4A4A',  # Dark gray — context, de-emphasized
-    'accent':    '#E8B72C',  # Bright gold — highlights, special callouts
+    'accent':    '#E8B72C',  # Bright gold — genuine records only (rare)
 }
 ```
 
@@ -57,8 +60,8 @@ If you have 10 bars, 8 are neutral gray, 1-2 are colored. That's it.
 ### EXACTLY 1 KEY INSIGHT per graph
 Every graph delivers ONE insight to the viewer — via arrow annotation, colored subtitle, or the title itself. Never zero, never two. See Rule 5 for the three delivery methods and when to use each.
 
-### ACCENT COLOR (gold) is RESERVED
-`PALETTE['accent']` (#E8B72C) is ONLY for truly shocking or critical information. If the data isn't genuinely surprising or urgent, do not use it. Most graphs will never use accent. When in doubt, use primary instead.
+### ACCENT COLOR (gold) is RESERVED — genuine records only
+`PALETTE['accent']` (#E8B72C) is ONLY for genuine records (all-time highs/lows, historic firsts). Routine weekly grain stats, normal year-over-year moves, and "strong week" headlines almost never warrant it. If the data isn't a real record, do not use it. Most graphs will never use accent. When in doubt, use primary instead.
 
 ---
 
@@ -93,7 +96,7 @@ colors[important_index] = PALETTE['primary']  # That's 2 colors. Usually enough.
 | Bad news, decline, danger | `negative` (orange) | Mortality rates, emissions increases |
 | A second series for comparison | `secondary` (teal) | A second line on a dual-line chart |
 | Context, background, everything else | `neutral` (gray) | All the bars/lines that aren't the story |
-| Truly shocking / urgent (rare) | `accent` (gold) | Almost never — see Hard Rules |
+| Genuine record only (rare) | `accent` (gold) | All-time high/low — not routine stats |
 
 Most graphs need only `neutral` + `primary`. Add a third color only when the story requires a contrast (e.g., positive vs negative trend).
 
@@ -149,6 +152,18 @@ BAD:  "10x GDP increase, only +2 happiness points past $20K"  (metric-focused, n
 BAD:  "Acceleration begins around 1980"  (vague, no number)
 ```
 
+**Commodity / farm-data voice** (when the unit is crop, province, or kilotonnes — not people):
+- Same punchy pattern, but WHO = growers / the crop / the prairie, not a clinical tonnage label.
+- Prefer farm-scale framing over spreadsheet nouns.
+
+```
+GOOD: "Saskatchewan durum is down 18% — elevators are waiting on a thinner crop"
+GOOD: "Canola crush demand is eating the prairie surplus — stocks fall to a 5-year low"
+
+BAD:  "SK durum production: −18% YoY"  (clinical)
+BAD:  "Canola stocks (kt) below 5-yr mean"  (spreadsheet voice)
+```
+
 ### 6. ALL Text Positioning Rules (CRITICAL)
 These rules apply to EVERY piece of text on the chart — annotations, direct labels, baseline markers, endpoint labels. Not just annotations.
 
@@ -196,6 +211,8 @@ for i in range(1, len(labels_sorted)):
 ### 7. Add Source Notes
 ```python
 add_source_note(ax, 'Source: Statistics Canada, 2024')
+# X posts (1200×675): figure-level footer instead
+add_figure_footer(fig, 'Source: Statistics Canada, 2024', handle='@AustinBakanec')
 ```
 
 ### 8. Chart Type Selection
@@ -247,11 +264,14 @@ Then offer to generate code for those too.
 1. **Always produce complete, runnable code** — imports, data loading, figure creation, styling, save/show
 2. **Always use the style kit** — load the mplstyle, use PALETTE colors, use annotation presets
 3. **Always write the insight title first** as a comment, then build the chart around it
-4. **Save to PNG** with `plt.savefig('descriptive_name.png', dpi=300, bbox_inches='tight')` and also `plt.show()`
+4. **Save to PNG** with `plt.savefig('descriptive_name.png', dpi=300, bbox_inches='tight')` for notebooks/slides. For X (exact 1200×675), use `create_x_figure()` / `save_x_figure()` — styles set `savefig.bbox: tight`, which crops fixed canvases. Keep `austin_presentation.mplstyle` tight-bbox behaviour for slides. Also `plt.show()`.
 5. **If working in a notebook**, wrap code in a single cell that produces the chart
 6. **If the user provides a CSV/DataFrame**, read it and explore it first, then choose the most impactful chart
 7. **Comment the context** at the top: audience, message, action
 8. **Verify what the data measures before making claims.** If the data is per-country, don't claim "X% of the world's population" unless you've confirmed with population weighting. If the data is GDP per capita, don't call it "income." Match your annotation language to what the data actually represents — or flag the approximation honestly.
+
+### X canvas (1200×675)
+Title band above the axes (`subplots_adjust` top≈0.78), plot in the middle, footer safe-zone below (bottom≈0.14) for `add_figure_footer`. Never rely on `bbox_inches='tight'` for these exports — see `storytelling_data.md`.
 
 ## File Locations
 

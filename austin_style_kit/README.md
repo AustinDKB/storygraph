@@ -43,7 +43,7 @@ High Contrast, Colorblind Safe:
 | **Primary** | `#5C2593` | Main data, key callouts, titles |
 | **Secondary** | `#0A5E73` | Second series, supporting info |
 | **Positive** | `#1A936F` | Wins, increases, good news |
-| **Accent** | `#E8B72C` | Highlights, special emphasis |
+| **Accent** | `#E8B72C` | Genuine records only (rare) |
 | **Negative** | `#BF5B04` | Warnings, decreases *(orange, not red!)* |
 | **Neutral** | `#4A4A4A` | Context, de-emphasized elements |
 
@@ -98,12 +98,12 @@ with plt.style.context('austin_presentation'):
 | `'positive'` | Good news (sea green) |
 | `'negative'` | Bad news (orange) |
 | `'neutral'` | Just facts (dark gray) |
-| `'accent'` | Special emphasis (gold) |
+| `'accent'` | Genuine records only (gold) |
 
 ### Usage
 
 ```python
-from austin_annotations import annotate, add_source_note
+from austin_annotations import annotate, add_source_note, add_figure_footer, create_x_figure, save_x_figure
 
 # Basic annotation
 annotate(ax, 'Peak revenue!', xy=(7, 85), xytext=(5, 95), preset='positive')
@@ -111,9 +111,16 @@ annotate(ax, 'Peak revenue!', xy=(7, 85), xytext=(5, 95), preset='positive')
 # For presentations (larger)
 annotate(ax, 'Key point', xy=(3, 50), xytext=(5, 60), preset='callout', presentation=True)
 
-# Add source note
+# Add source note (axes-level — notebooks/slides)
 add_source_note(ax, 'Source: Company data, 2024')
+
+# X posts: exact 1200×675 (styles set savefig.bbox: tight — use save_x_figure)
+fig, ax = create_x_figure()
+add_figure_footer(fig, 'Source: Company data, 2024', handle='@AustinBakanec')
+save_x_figure(fig, 'for_x.png')
 ```
+
+`austin_presentation.mplstyle` still uses `savefig.bbox: tight` for slides — do not change that for everyday slide exports.
 
 ---
 

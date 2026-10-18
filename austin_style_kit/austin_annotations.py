@@ -405,13 +405,72 @@ def add_title_annotation(ax, text, loc='upper left', **kwargs):
 
 
 def add_source_note(ax, text, **kwargs):
-    """Add a source/footnote at bottom of chart."""
+    """Add a source/footnote at bottom of chart (axes-level).
+
+    For X / fixed 1200×675 canvases, prefer :func:`add_figure_footer`
+    so source and handle share one figure-level footer band.
+    """
     defaults = dict(
         fontsize=8, color='#888888', style='italic',
         transform=ax.transAxes, ha='left', va='bottom',
     )
     defaults.update(kwargs)
     return ax.text(0.02, -0.08, text, **defaults)
+
+
+def add_figure_footer(fig, source, handle='@AustinBakanec', date=None, **kwargs):
+    """Figure-level dual footer: source left, ``@handle · date`` right.
+
+    Place in the footer safe-zone of an X canvas (see :func:`create_x_figure`).
+    Does not replace :func:`add_source_note` for notebook/slide charts.
+    """
+    from datetime import date as date_cls
+
+    if date is None:
+        date = date_cls.today().isoformat()
+    right = f'{handle} · {date}'
+    style = dict(fontsize=8, color='#888888', style='italic')
+    style.update(kwargs)
+    left_t = fig.text(0.04, 0.035, source, ha='left', va='bottom', **style)
+    right_t = fig.text(0.96, 0.035, right, ha='right', va='bottom', **style)
+    return left_t, right_t
+
+
+# ============================================================
+# X CANVAS (1200×675) — fixed size, no tight-bbox crop
+# ============================================================
+
+X_WIDTH_PX = 1200
+X_HEIGHT_PX = 675
+X_DPI = 100  # figsize inches = px / dpi → exactly 12.0 × 6.75
+
+# Title band / plot / footer safe-zone (figure fraction)
+X_SUBPLOT = dict(left=0.08, right=0.96, top=0.78, bottom=0.14)
+
+
+def create_x_figure(**kwargs):
+    """Create a figure sized for an exact 1200×675 X PNG.
+
+    Leaves a title band above the axes and a footer safe-zone below.
+    Pair with :func:`save_x_figure` — notebook/presentation styles set
+    ``savefig.bbox: tight``, which would otherwise crop the fixed canvas.
+    Slide workflows should keep using ``austin_presentation.mplstyle`` as usual.
+    """
+    figsize = kwargs.pop('figsize', (X_WIDTH_PX / X_DPI, X_HEIGHT_PX / X_DPI))
+    dpi = kwargs.pop('dpi', X_DPI)
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi, **kwargs)
+    fig.subplots_adjust(**X_SUBPLOT)
+    return fig, ax
+
+
+def save_x_figure(fig, path, **kwargs):
+    """Save at exact canvas pixels; overrides style ``savefig.bbox: tight``."""
+    dpi = kwargs.pop('dpi', X_DPI)
+    facecolor = kwargs.pop('facecolor', fig.get_facecolor())
+    # rc savefig.bbox: tight wins over bbox_inches=None — clear it for this write
+    with plt.rc_context({'savefig.bbox': None}):
+        fig.savefig(path, dpi=dpi, facecolor=facecolor, bbox_inches=None, **kwargs)
+    return path
 
 
 # ============================================================

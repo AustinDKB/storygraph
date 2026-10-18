@@ -697,6 +697,43 @@ Before finalizing any chart, ask these questions:
 - Is the title a headline that conveys the insight?
 - Have you eliminated the need for a legend through direct labeling?
 
+## StoryGraph kit additions (X canvas, voice, accent)
+
+### X 16:9 canvas (1200×675)
+
+Posting to X needs an **exact** pixel canvas. The kit styles set `savefig.bbox: tight`, which crops away the fixed margins — so do not use plain `plt.savefig(..., bbox_inches='tight')` for these exports. Use the helpers in `austin_annotations.py`:
+
+```python
+from austin_annotations import create_x_figure, save_x_figure, add_figure_footer, PALETTE
+
+fig, ax = create_x_figure()
+# … plot …
+# Title band: place insight titles with ax.text(..., transform=ax.transAxes) above y=1.0
+# Footer safe-zone: reserved below the axes (subplots_adjust bottom≈0.14)
+add_figure_footer(fig, 'Source: AAFC / StatCan, 2024', handle='@AustinBakanec')
+save_x_figure(fig, 'crop_chart.png')  # → 1200×675 PNG
+```
+
+Layout (figure fraction via `create_x_figure`):
+- **Title band** — above the axes (`top≈0.78`); put headline / subtitle here
+- **Plot** — middle band
+- **Footer safe-zone** — below the axes (`bottom≈0.14`); source left, `@handle · date` right
+
+Slide workflows keep using `austin_presentation.mplstyle` with tight bbox as before.
+
+### Commodity / farm-data voice
+
+People-centered framing still applies when the story is about people. When the unit is crop, province, or kilotonnes, use farm voice — growers, elevators, the prairie — not clinical spreadsheet nouns:
+
+```
+GOOD: "Saskatchewan durum is down 18% — elevators are waiting on a thinner crop"
+BAD:  "SK durum production: −18% YoY"
+```
+
+### Accent (gold) — genuine records only
+
+`PALETTE['accent']` is reserved for genuine records (all-time highs/lows, historic firsts). Routine weekly grain stats almost never warrant it; use `primary` instead.
+
 ## Summary Checklist
 
 Before you consider any visualization complete, verify that you have addressed each principle:
