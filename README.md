@@ -76,7 +76,7 @@ import sys, os
 
 sys.path.insert(0, os.path.join('austin_style_kit'))
 plt.style.use(os.path.join('austin_style_kit', 'my_notebook.mplstyle'))
-from austin_annotations import PALETTE, annotate, add_source_note
+from austin_annotations import PALETTE, annotate, add_source_note, add_figure_footer, create_x_figure, save_x_figure
 
 # Gray everything, color the story
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -95,7 +95,7 @@ Every chart follows three hard rules:
 
 1. **Maximum 3 colors per graph.** Gray for context, one color for the story, one more only if needed.
 2. **Exactly 1 key insight per graph.** Delivered via arrow annotation, colored subtitle, or the title itself.
-3. **Accent color (gold) is reserved.** Only for genuinely shocking or urgent information. Most charts never use it.
+3. **Accent color (gold) is reserved.** Only for genuine records (all-time highs/lows). Routine weekly grain stats almost never warrant it.
 
 ---
 
@@ -124,7 +124,7 @@ PALETTE = {
     'negative':  '#BF5B04',  # Deep orange  - bad news, decreases
     'positive':  '#1A936F',  # Sea green    - good news, increases
     'neutral':   '#4A4A4A',  # Dark gray    - context, de-emphasized
-    'accent':    '#E8B72C',  # Bright gold  - reserved for shock value
+    'accent':    '#E8B72C',  # Bright gold  - genuine records only
 }
 ```
 
