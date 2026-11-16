@@ -13,6 +13,7 @@ cp austin_presentation.mplstyle ~/.config/matplotlib/stylelib/
 # Copy Python modules to your project or site-packages
 cp austin_annotations.py /path/to/your/project/
 cp austin_colormaps.py /path/to/your/project/
+cp austin_rules.py /path/to/your/project/
 ```
 
 ## Quick Start
@@ -182,6 +183,7 @@ austin_style_kit/
 ├── austin_presentation.mplstyle  # Slides and presentations
 ├── austin_annotations.py         # Annotation presets + PALETTE
 ├── austin_colormaps.py           # Heatmap colormaps
+├── austin_rules.py               # Lint checks + gap/panel/breakout helpers
 └── README.md                     # This file
 ```
 
