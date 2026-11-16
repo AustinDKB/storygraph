@@ -42,6 +42,9 @@ HELPER_GID = 'storygraph:helper'
 # A shaded gap is chart furniture, so give it the light purple tint.
 GAP_COLOR = '#EDE7F3'
 
+# The gap-shade band plot_with_gaps draws, distinct from other helper furniture.
+GAP_GID = 'storygraph:gap'
+
 
 class StoryGraphRuleError(ValueError):
     """Raised when a chart breaks a hard storytelling rule."""
@@ -217,6 +220,15 @@ def _is_guide(line):
     return x.size == 2 and (x[0] == x[1] or y[0] == y[1])
 
 
+def _draws_line(line):
+    """True when a line actually draws its connecting segments."""
+    return line.get_linestyle() not in ('None', 'none', '', ' ', None)
+
+
+def _has_marker(line):
+    return line.get_marker() not in ('None', 'none', '', ' ', None)
+
+
 def _luminance(rgb):
     channels = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
     r, g, b = channels
@@ -257,17 +269,35 @@ def _marker_boxes(ax, coll):
             if np.isfinite(x) and np.isfinite(y)]
 
 
+def _line_marker_boxes(ax, line):
+    """Display-space boxes of a line's drawn markers."""
+    if not _has_marker(line):
+        return []
+    size = line.get_markersize()
+    if size <= 0:
+        return []
+    x, y = _line_xy(ax, line)
+    points = line.get_transform().transform(np.column_stack([x, y]))
+    radius = size / 2.0 * ax.figure.get_dpi() / 72.0
+    return [Bbox([[px - radius, py - radius], [px + radius, py + radius]])
+            for px, py in points if np.isfinite(px) and np.isfinite(py)]
+
+
 def _check_labels_vs_data(ax, inside, pad):
     found = []
     bar_boxes = [(p, p.get_window_extent()) for p in ax.patches
                  if p.get_visible() and p.get_gid() != HELPER_GID]
     data_lines = [ln for ln in ax.lines
                   if ln.get_visible() and len(ln.get_xdata()) > 1
-                  and ln.get_gid() != HELPER_GID and not _is_guide(ln)]
-    marker_boxes = [b for coll in ax.collections
-                    if isinstance(coll, PathCollection)
-                    and coll.get_visible() and coll.get_gid() != HELPER_GID
-                    for b in _marker_boxes(ax, coll)]
+                  and ln.get_gid() != HELPER_GID and not _is_guide(ln)
+                  and _draws_line(ln)]
+    markers = [b for coll in ax.collections
+               if isinstance(coll, PathCollection)
+               and coll.get_visible() and coll.get_gid() != HELPER_GID
+               for b in _marker_boxes(ax, coll)]
+    markers += [b for ln in ax.lines
+                if ln.get_visible() and ln.get_gid() != HELPER_GID
+                for b in _line_marker_boxes(ax, ln)]
 
     for text, box in inside:
         box = box.padded(pad) if pad else box
@@ -288,11 +318,11 @@ def _check_labels_vs_data(ax, inside, pad):
                         f'label {text.get_text()!r} sits on {owner} — give it clearance',
                         artist=text))
                     break
-        for marker in marker_boxes:
+        for marker in markers:
             if box.overlaps(marker):
                 found.append(Violation(
                     'label-on-data',
-                    f'label {text.get_text()!r} sits on a scatter marker — give it clearance',
+                    f'label {text.get_text()!r} sits on a marker — give it clearance',
                     artist=text))
                 break
     return found
@@ -326,10 +356,21 @@ def _patch_x_span(patch, ax):
     return box.x0, box.x1
 
 
+def _is_gap_shade(patch, ax):
+    """A vertical span that marks a missing-data period (the kit band or a user axvspan)."""
+    if patch.get_gid() == GAP_GID:
+        return True
+    if patch.get_gid() is not None:
+        return False
+    ax_box = ax.get_window_extent()
+    box = patch.get_window_extent()
+    return box.y0 <= ax_box.y0 + 1.0 and box.y1 >= ax_box.y1 - 1.0
+
+
 def _check_gaps(ax):
     found = []
     formatter = ax.xaxis.get_major_formatter()
-    patches = [p for p in ax.patches if p.get_visible()]
+    patches = [p for p in ax.patches if p.get_visible() and _is_gap_shade(p, ax)]
     for line in ax.lines:
         if not line.get_visible():
             continue
@@ -422,7 +463,7 @@ def plot_with_gaps(ax, x, y, gap_label=None, color=None, shade_color=GAP_COLOR,
     spans = gap_intervals(x, y)
     for x0, x1 in spans:
         band = ax.axvspan(x0, x1, color=shade_color, alpha=0.6, linewidth=0, zorder=zorder)
-        band.set_gid(HELPER_GID)
+        band.set_gid(GAP_GID)
     if spans and gap_label:
         x0, x1 = spans[0]
         middle = np.mean(np.asarray(ax.convert_xunits([x0, x1]), dtype=float))

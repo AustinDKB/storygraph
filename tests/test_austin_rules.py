@@ -160,6 +160,24 @@ def test_label_clear_of_a_scatter_point_passes():
     assert 'label-on-data' not in rules(fig)
 
 
+def test_label_between_markers_of_a_marker_only_line_passes():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot([1, 2, 3], [1, 4, 9], 'o')
+    ax.set_ylim(0, 10)
+    ax.text(1.5, 2.5, 'note')
+
+    assert 'label-on-data' not in rules(fig)
+
+
+def test_label_on_a_line_marker_is_flagged():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot([1, 2, 3], [1, 4, 9], 'o')
+    ax.set_ylim(0, 10)
+    ax.text(2, 4, 'on the marker', ha='center', va='center')
+
+    assert 'label-on-data' in rules(fig)
+
+
 # ============================================================
 # Issue #2 item 2: missing-data periods must be marked
 # ============================================================
@@ -177,6 +195,24 @@ def test_plot_with_gaps_shades_the_gap():
     plot_with_gaps(ax, x, y, gap_label='no data')
 
     assert len(ax.patches) == 1              # the shaded band
+    assert 'gap-unmarked' not in rules(fig)
+
+
+def test_add_breakout_over_an_unmarked_gap_still_flags():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    x = np.arange(10, dtype=float)
+    y = np.array([1, 2, np.nan, np.nan, 5, 6, 7, 8, 9, 10], dtype=float)
+    ax.plot(x, y)
+    add_breakout(ax, xlim=(0.5, 4.5))
+
+    assert 'gap-unmarked' in rules(fig)
+
+
+def test_a_manual_axvspan_marks_the_gap():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot(np.arange(6), [1, 2, np.nan, np.nan, 5, 6])
+    ax.axvspan(1, 4, color='#EDE7F3', alpha=0.6)
+
     assert 'gap-unmarked' not in rules(fig)
 
 
