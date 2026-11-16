@@ -140,6 +140,26 @@ def test_white_label_inside_a_stacked_segment_passes():
     assert 'label-on-data' not in rules(fig)
 
 
+def test_label_on_a_scatter_point_is_flagged():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.scatter([2], [2])
+    ax.set_xlim(0, 4)
+    ax.set_ylim(0, 4)
+    ax.text(2, 2, 'on the marker', ha='center', va='center')
+
+    assert 'label-on-data' in rules(fig)
+
+
+def test_label_clear_of_a_scatter_point_passes():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.scatter([2], [2])
+    ax.set_xlim(0, 4)
+    ax.set_ylim(0, 4)
+    ax.text(1, 3.5, 'clear of the marker')
+
+    assert 'label-on-data' not in rules(fig)
+
+
 # ============================================================
 # Issue #2 item 2: missing-data periods must be marked
 # ============================================================
@@ -209,6 +229,16 @@ def test_a_year_used_as_an_axis_label_passes():
     ax.text(0, 1.05, 'Deaths per 100 live births, 1990 vs 2023',
             transform=ax.transAxes)
     ax.text(1, 8, '1990')
+
+    assert 'title-repeats' not in rules(fig)
+
+
+def test_a_year_in_a_source_note_is_not_a_title():
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot([1, 2], [3, 4])
+    ax.set_ylim(0, 10)
+    ax.text(0.02, -0.08, 'Source: Statistics Canada, 2024', transform=ax.transAxes)
+    ax.text(3, 1, '2024: $1.2M')
 
     assert 'title-repeats' not in rules(fig)
 

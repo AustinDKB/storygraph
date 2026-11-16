@@ -31,8 +31,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 from matplotlib.patches import ConnectionPatch, FancyArrowPatch, Rectangle
+from matplotlib.collections import PathCollection
 from matplotlib.path import Path
 from matplotlib.text import Annotation, Text
+from matplotlib.transforms import Bbox
 
 # Artists the helpers below add on purpose; they are background, not data.
 HELPER_GID = 'storygraph:helper'
@@ -136,13 +138,14 @@ def _text_box(text):
 
 
 def _text_boxes(ax):
-    """Split the axes' texts into (inside the plot area, outside it).
+    """Split the axes' texts into (inside the plot area, the title band above it).
 
-    A text anchored below or above the plot area is furniture — a source note
-    or a title band — not a label that can sit on data.
+    A text anchored above the plot area is a title band; one anchored below is
+    a source note. Neither is a label that can sit on data, and only the title
+    band feeds the title-repeats check.
     """
     ax_box = ax.get_window_extent()
-    inside, outside = [], []
+    inside, above = [], []
     for text in ax.texts:
         if not text.get_visible() or not text.get_text().strip():
             continue
@@ -150,8 +153,11 @@ def _text_boxes(ax):
             continue
         anchor = text.get_transform().transform(text.get_position())
         box = _text_box(text)
-        (inside if ax_box.y0 <= anchor[1] <= ax_box.y1 else outside).append((text, box))
-    return inside, outside
+        if ax_box.y0 <= anchor[1] <= ax_box.y1:
+            inside.append((text, box))
+        elif anchor[1] > ax_box.y1:
+            above.append((text, box))
+    return inside, above
 
 
 def _check_labels_vs_ticks(ax, inside):
@@ -231,6 +237,26 @@ def _legible_on(text, patch):
     return _contrast_ratio(to_rgb(text.get_color()), background) >= 3.0
 
 
+def _marker_boxes(ax, coll):
+    """Display-space boxes of each marker in a collection (scatter points)."""
+    offsets = coll.get_offsets()
+    if offsets is None or len(offsets) == 0:
+        return []
+    sizes = np.asarray(coll.get_sizes(), dtype=float)
+    if sizes.size == 0:
+        return []
+    try:
+        display = np.asarray(coll.get_offset_transform().transform(offsets), dtype=float)
+    except ValueError:
+        return []
+    dpi = ax.figure.get_dpi()
+    radii = np.sqrt(np.maximum(sizes, 0)) / 2.0 * dpi / 72.0
+    radii = np.broadcast_to(radii, display.shape[:1])
+    return [Bbox([[x - r, y - r], [x + r, y + r]])
+            for (x, y), r in zip(display, radii)
+            if np.isfinite(x) and np.isfinite(y)]
+
+
 def _check_labels_vs_data(ax, inside, pad):
     found = []
     bar_boxes = [(p, p.get_window_extent()) for p in ax.patches
@@ -238,6 +264,10 @@ def _check_labels_vs_data(ax, inside, pad):
     data_lines = [ln for ln in ax.lines
                   if ln.get_visible() and len(ln.get_xdata()) > 1
                   and ln.get_gid() != HELPER_GID and not _is_guide(ln)]
+    marker_boxes = [b for coll in ax.collections
+                    if isinstance(coll, PathCollection)
+                    and coll.get_visible() and coll.get_gid() != HELPER_GID
+                    for b in _marker_boxes(ax, coll)]
 
     for text, box in inside:
         box = box.padded(pad) if pad else box
@@ -258,6 +288,13 @@ def _check_labels_vs_data(ax, inside, pad):
                         f'label {text.get_text()!r} sits on {owner} — give it clearance',
                         artist=text))
                     break
+        for marker in marker_boxes:
+            if box.overlaps(marker):
+                found.append(Violation(
+                    'label-on-data',
+                    f'label {text.get_text()!r} sits on a scatter marker — give it clearance',
+                    artist=text))
+                break
     return found
 
 
