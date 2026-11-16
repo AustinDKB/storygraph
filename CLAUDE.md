@@ -63,6 +63,14 @@ Every graph delivers ONE insight to the viewer — via arrow annotation, colored
 ### ACCENT COLOR (gold) is RESERVED — genuine records only
 `PALETTE['accent']` (#E8B72C) is ONLY for genuine records (all-time highs/lows, historic firsts). Routine weekly grain stats, normal year-over-year moves, and "strong week" headlines almost never warrant it. If the data isn't a real record, do not use it. Most graphs will never use accent. When in doubt, use primary instead.
 
+### NO DUAL Y AXIS — one scale per plot
+The viewer cannot compare two scales that share one frame, and the chart silently invents a correlation. Never use `ax.twinx()`, `ax.twiny()`, or `ax.secondary_yaxis()`. Pick one of these instead:
+- **Index both series to 100 at the start year** and plot them on one scale — this is the default fix
+- **Two stacked panels** sharing the x axis, joined by `connect_panels()` (see Rule 11)
+- **Two series that share a unit** — plot them plainly, they never needed a second axis
+
+`lint()` treats a dual axis as an error, not a warning.
+
 ---
 
 ## Storytelling Rules (follow EVERY time you make a graph)
@@ -236,6 +244,38 @@ add_figure_footer(fig, 'Source: Statistics Canada, 2024', handle='@AustinBakanec
 - **Label ALL categories** in the direct-label legend at the top, including "Other". Every color in the chart must be explained.
 - Use neutral gray for the "background" category, and color only the 1-2 categories that ARE the story.
 
+### 10. Missing Data — Break the Line, Mark the Gap
+Never connect through a period with no data: that draws a trend the data does not show. Break the line at the gap and shade the range so the viewer sees the hole.
+```python
+from austin_rules import plot_with_gaps
+plot_with_gaps(ax, df['Year'], df['Value'], gap_label='no data 1992–1995')
+```
+`plot_with_gaps()` breaks the line at every NaN, shades each gap in the pale purple tint, and labels the first gap. One gap label is enough — do not repeat it for every gap.
+
+### 11. Connected Panels and Breakout Zoom
+When two charts tell one sequential story (total → breakdown, cause → effect), keep them in one figure and join them with a connector. Do not split them across slides.
+```python
+from austin_rules import connect_panels, add_breakout
+connect_panels(fig, total_ax, breakdown_ax, text='who drove it')
+zoom = add_breakout(ax, xlim=(2008, 2012), ylim=(0, 5), text='2008 crash')  # plot the slice into zoom
+```
+`add_breakout()` outlines the slice, adds a zoom panel, and links the two — use it when one region of the data carries the insight and the full range would flatten it.
+
+### 12. Run the lint before you ship
+```python
+from austin_rules import lint
+lint(fig)   # prints violations; raises on a dual y axis
+```
+| Check | Flags |
+|---|---|
+| `dual-axis` | a twin or secondary scale (error — refuses to pass) |
+| `label-vs-tick` | a label touching a tick label or gridline |
+| `label-on-data` | a label on a line, bar, or marker, or on a bar with too little contrast |
+| `gap-unmarked` | a line running through missing data with no marked gap |
+| `title-repeats` | a label restating a number the title already gives |
+
+The checks are geometric and approximate, so they judge what actually renders. Treat a warning as a prompt to look at the chart, not as a rule to argue with.
+
 ---
 
 ## The Question Expansion Rule
@@ -277,6 +317,7 @@ Title band above the axes, plot in the middle, footer safe-zone below for `add_f
 
 - Style files: `austin_style_kit/my_notebook.mplstyle`, `austin_style_kit/austin_presentation.mplstyle`
 - Annotations: `austin_style_kit/austin_annotations.py`
+- Rules and lint: `austin_style_kit/austin_rules.py` (tests in `tests/test_austin_rules.py`)
 - Colormaps: `austin_style_kit/austin_colormaps.py`
 - Methodology guide: `storytelling_data.md`
 - Example notebook: `austin_style_kit/emplyee_wages_in_canada.ipynb`

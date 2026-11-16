@@ -99,6 +99,29 @@ Every chart follows three hard rules:
 
 ---
 
+## Enforced Rules
+
+The kit ships a lint for the rules a chart can break by accident:
+
+```python
+from austin_rules import lint
+lint(fig)   # prints violations; raises on a dual y axis
+```
+
+| Check | Flags |
+|---|---|
+| `dual-axis` | a twin or secondary y scale (error — one scale per plot) |
+| `label-vs-tick` | a label touching a tick label or gridline |
+| `label-on-data` | a label on a line, bar, or marker |
+| `gap-unmarked` | a line running through missing data with no marked gap |
+| `title-repeats` | a label restating a number the title already gives |
+
+Three helpers cover what the checks ask for: `plot_with_gaps()` breaks a line and shades
+missing periods, `connect_panels()` joins two panels of one story, and `add_breakout()`
+adds a zoom panel to a slice of the data.
+
+---
+
 ## Chart Type Selection
 
 | Question | Chart Type | Notes |
@@ -146,7 +169,9 @@ storygraph/
 │   ├── my_notebook.mplstyle
 │   ├── austin_presentation.mplstyle
 │   ├── austin_annotations.py
+│   ├── austin_rules.py
 │   └── austin_colormaps.py
+├── tests/                  # pytest suite for the rules
 ├── datasets/               # CSV data files (Our World in Data)
 ├── graphs/                 # 10 polished example charts
 │   └── ugly/               # 10 default matplotlib versions
